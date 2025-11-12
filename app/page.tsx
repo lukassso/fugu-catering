@@ -1,65 +1,128 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from 'react';
+import { quickQueries } from '@/data/catering';
+import { parseQuery, generateRecommendation } from '@/lib/catering-logic';
+import { toast } from "sonner"; 
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ReservationForm } from '@/components/ReservationForm';
+
+export default function CateringPage() {
+  const [query, setQuery] = useState('');
+  const [recommendation, setRecommendation] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showRecommendation, setShowRecommendation] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleGenerate = () => {
+    if (!query.trim()) {
+      toast.error("Błąd", { description: "Proszę wpisać zapytanie!" });
+      return;
+    }
+    setIsLoading(true);
+    setShowRecommendation(false);
+    setTimeout(() => {
+      const parsed = parseQuery(query);
+      const result = generateRecommendation(parsed);
+      setRecommendation(result);
+      setIsLoading(false);
+      setShowRecommendation(true);
+    }, 1500);
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(recommendation);
+    toast.success("Skopiowano!", { description: "Rekomendacja jest w Twoim schowku." });
+  };
+
+  const handleReservationSuccess = () => {
+    setIsModalOpen(false);
+    toast.success("Sukces!", { description: "Twoje zgłoszenie zostało wysłane. Skontaktujemy się wkrótce." });
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <>
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-[625px]">
+          <DialogHeader>
+            <DialogTitle>📅 Formularz Rezerwacji Imprezy</DialogTitle>
+          </DialogHeader>
+          <ReservationForm
+            recommendation={recommendation}
+            onClose={() => setIsModalOpen(false)}
+            onSubmitSuccess={handleReservationSuccess}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <div className="container mx-auto flex min-h-screen flex-col items-center py-8">
+        <header className="mb-8 text-center">
+          <h1 className="mb-2 text-4xl font-bold tracking-tighter">🍣 Fugu Sushi Catering Assistant</h1>
+          <p className="text-lg text-muted-foreground">Inteligentny kalkulator zamówień dla grup</p>
+        </header>
+
+        <main className="w-full max-w-4xl space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Krok 1: Opisz swoje potrzeby</CardTitle>
+              <CardDescription>Podaj liczbę osób i preferencje, a my zajmiemy się resztą.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                rows={3}
+                placeholder="Np. dla 18 osób, 4 wege, 2 dzieci"
+              />
+              <div className="flex flex-wrap gap-2">
+                {quickQueries.map((q) => (
+                  <Button key={q.value} variant="outline" size="sm" onClick={() => setQuery(q.value)}>
+                    {q.text}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={handleGenerate} disabled={isLoading} className="w-full">
+                {isLoading ? "Generowanie..." : "✨ Generuj Rekomendację"}
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {(isLoading || showRecommendation) && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Krok 2: Twoja rekomendacja</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <p className="text-muted-foreground">Analizuję Twoje zapytanie...</p>
+                  </div>
+                ) : (
+                  <div className="rounded-md bg-muted p-4">
+                    <pre className="whitespace-pre-wrap font-mono text-sm">{recommendation}</pre>
+                  </div>
+                )}
+              </CardContent>
+              {!isLoading && showRecommendation && (
+                <CardFooter className="flex-col gap-3 sm:flex-row">
+                  <Button variant="secondary" className="w-full" onClick={handleCopy}>📋 Skopiuj</Button>
+                  <Button className="w-full" onClick={() => setIsModalOpen(true)}>📅 Rezerwuj Imprezę</Button>
+                </CardFooter>
+              )}
+            </Card>
+          )}
+        </main>
+        
+        <footer className="mt-12 text-center text-sm text-muted-foreground">
+            <p>FUGU SUSHI | ul. Chodkiewicza 7, Warszawa | <a href="tel:510219510" className="hover:underline">510 219 510</a></p>
+        </footer>
+      </div>
+    </>
   );
 }

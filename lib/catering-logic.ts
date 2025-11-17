@@ -70,7 +70,7 @@ export function generateRecommendation(parsedQuery: ParsedQuery): string {
 
   let recommendation = `🍣 REKOMENDACJA DLA ${totalPeople} OSÓB\n\n`;
   
-  let details = [];
+  const details = [];
   if (regularAdults > 0) details.push(`${regularAdults} dorosłych`);
   if (vegetarians > 0) details.push(`${vegetarians} wegetarian`);
   if (children > 0) details.push(`${children} dzieci`);
@@ -78,7 +78,7 @@ export function generateRecommendation(parsedQuery: ParsedQuery): string {
 
   recommendation += `Szacuję, że będzie Państwu potrzebne około ${totalPiecesNeeded} sztuk sushi. Oto moja propozycja:\n\n`;
 
-  let selectedSets = [];
+  const selectedSets = [];
   let totalPieces = 0;
   let totalCost = 0;
 

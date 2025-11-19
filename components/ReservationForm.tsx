@@ -60,7 +60,7 @@ export function ReservationForm({ recommendation, onClose, onSubmitSuccess }: Re
   }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-h-[70vh] overflow-y-auto pr-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-h-[70vh] overflow-y-auto pl-1 pr-4">
 
         <h3 className="text-lg font-semibold">Informacje o Imprezie</h3>
         <FormField control={form.control} name="eventName" render={({ field }) => (

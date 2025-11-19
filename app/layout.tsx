@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/ThemeProvider";
-import { Toaster } from "@/components/ui/sonner"; 
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: '🍣 Fugu Sushi Catering Assistant',
+  title: '🍣 Fugu Sushi - asystent kateringu',
   description: 'Inteligentny kalkulator zamówień sushi dla grup',
 };
 
@@ -27,9 +27,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`dark ${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`light ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-      <Providers>{children}<Toaster richColors /> </Providers>
+        <Providers>{children}<Toaster richColors /> </Providers>
       </body>
     </html>
   );

@@ -49,10 +49,10 @@
   --card-foreground: rgb(26, 26, 26);
   --popover: rgb(250, 247, 245);
   --popover-foreground: rgb(26, 26, 26);
-  --primary: rgb(155, 44, 44);
+  --primary: rgb(233, 78, 27);
   --primary-foreground: rgb(255, 255, 255);
-  --secondary: rgb(253, 242, 214);
-  --secondary-foreground: rgb(128, 85, 0);
+  --secondary: rgb(242, 242, 247);
+  --secondary-foreground: rgb(26, 26, 26);
   --muted: rgb(240, 235, 232);
   --muted-foreground: rgb(87, 83, 78);
   --accent: rgb(254, 243, 199);
@@ -61,7 +61,7 @@
   --destructive-foreground: rgb(255, 255, 255);
   --border: rgb(245, 232, 210);
   --input: rgb(245, 232, 210);
-  --ring: rgb(155, 44, 44);
+  --ring: rgb(233, 78, 27);
   --chart-1: rgb(185, 28, 28);
   --chart-2: rgb(155, 44, 44);
   --chart-3: rgb(127, 29, 29);
@@ -69,12 +69,12 @@
   --chart-5: rgb(146, 64, 14);
   --sidebar: rgb(240, 235, 232);
   --sidebar-foreground: rgb(26, 26, 26);
-  --sidebar-primary: rgb(155, 44, 44);
+  --sidebar-primary: rgb(233, 78, 27);
   --sidebar-primary-foreground: rgb(255, 255, 255);
   --sidebar-accent: rgb(254, 243, 199);
   --sidebar-accent-foreground: rgb(127, 29, 29);
   --sidebar-border: rgb(245, 232, 210);
-  --sidebar-ring: rgb(155, 44, 44);
+  --sidebar-ring: rgb(233, 78, 27);
   --font-sans: Poppins, sans-serif;
   --font-serif: Libre Baskerville, serif;
   --font-mono: IBM Plex Mono, monospace;
@@ -97,6 +97,7 @@
   --spacing: 0.25rem;
 }
 
+
 .dark {
   --background: rgb(28, 25, 23);
   --foreground: rgb(245, 245, 244);
@@ -104,7 +105,7 @@
   --card-foreground: rgb(245, 245, 244);
   --popover: rgb(41, 37, 36);
   --popover-foreground: rgb(245, 245, 244);
-  --primary: rgb(185, 28, 28);
+  --primary: rgb(233, 78, 27);
   --primary-foreground: rgb(250, 247, 245);
   --secondary: rgb(146, 64, 14);
   --secondary-foreground: rgb(254, 243, 199);
@@ -154,6 +155,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

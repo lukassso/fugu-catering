@@ -35,7 +35,28 @@ export async function submitCateringRequest(
             from: 'Fugu Catering <onboarding@resend.dev>',
             to: [adminEmail],
             subject: `Nowe zapytanie cateringowe: ${eventName}`,
-            html: `<div>... (Twój kod HTML emaila) ...</div>`,
+            html: `
+        <div>
+          <h1>Nowe zapytanie cateringowe od <strong>${organizerName}</strong></h1>
+          <hr>
+          <h2>Szczegóły imprezy:</h2>
+          <ul>
+            <li><strong>Nazwa:</strong> ${eventName}</li>
+            <li><strong>Data:</strong> ${result.data.eventDate} o ${result.data.eventTime}</li>
+            <li><strong>Lokalizacja:</strong> ${result.data.location}</li>
+          </ul>
+          <h2>Dane kontaktowe klienta:</h2>
+          <ul>
+            <li><strong>Email:</strong> <a href="mailto:${email}">${email}</a></li>
+            <li><strong>Telefon:</strong> <a href="tel:${phone}">${phone}</a></li>
+          </ul>
+          <h2>Dodatkowe uwagi:</h2>
+          <p>${notes || 'Brak uwag'}</p>
+          <hr>
+          <h2>Wygenerowana rekomendacja sushi:</h2>
+          <pre style="background-color: #f4f4f4; padding: 15px; border-radius: 5px;">${recommendation}</pre>
+        </div>
+      `,
         });
 
         if (error) {

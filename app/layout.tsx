@@ -11,8 +11,8 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
-  title: '🍣 Fugu Sushi - asystent kateringu',
-  description: 'Inteligentny kalkulator zamówień sushi dla grup',
+  title: '🍣 Fugu Sushi - użyj asystenta kateringu',
+  description: 'Inteligentny kalkulator zamówień sushi dla grup. Oferujemy catering sushi dla firm, spotkań biznesowych, eventów oraz prywatnych przyjęć.',
 };
 
 export default function RootLayout({

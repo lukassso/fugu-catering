@@ -26,6 +26,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ReservationForm } from "@/components/ReservationForm";
 import Image from "next/image";
+import { CateringCalculator } from "@/components/CateringCalculator";
 
 export default function CateringPage() {
   const [query, setQuery] = useState("");
@@ -74,19 +75,6 @@ export default function CateringPage() {
 
   return (
     <>
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[625px]">
-          <DialogHeader>
-            <DialogTitle>📅 Formularz Rezerwacji Imprezy</DialogTitle>
-          </DialogHeader>
-          <ReservationForm
-            recommendation={recommendation}
-            onClose={() => setIsModalOpen(false)}
-            onSubmitSuccess={handleReservationSuccess}
-          />
-        </DialogContent>
-      </Dialog>
-
       <div className="min-h-screen bg-background text-foreground overflow-x-hidden relative">
 
         <div
@@ -118,95 +106,8 @@ export default function CateringPage() {
               </h2>
             </div>
           </header>
-
           <main className="px-4 w-full max-w-2xl space-y-8">
-            <Card className="bg-white dark:bg-white/10 backdrop-blur-md border-black/10 shadow-2xl">
-              <CardHeader className="text-left">
-                <CardTitle className="text-foreground font-medium text-base h-6 leading-6">Krok 1: Opisz swoje potrzeby</CardTitle>
-                <CardDescription className="text-muted-foreground text-sm">
-                  Podaj liczbę osób i preferencje, a my zajmiemy się resztą.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Textarea
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="np. 18 osób, większość pieczone, 4 osoby wege"
-                  className="border-0 focus-visible:ring-1 focus-visible:ring-primary"
-                />
-                <div className="flex flex-wrap gap-3">
-                  {quickQueries.map((q) => (
-                    <Badge
-                      key={q.value}
-                      variant="secondary"
-                      onClick={() => setQuery(q.value)}
-                      className={`px-6 py-2 h-auto font-normal cursor-pointer transition-colors ${query === q.value
-                        ? "border-primary"
-                        : "hover:bg-secondary/80"
-                        }`}
-                    >
-                      {q.text}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  onClick={handleGenerate}
-                  disabled={isLoading}
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-medium h-14 rounded-xl transition-all duration-200 shadow-lg hover:shadow-primary/20"
-                >
-                  {isLoading ? (
-                    "Generowanie..."
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      Generuj rekomendację <Sparkles className="w-6 h-6" />
-                    </span>
-                  )}
-                </Button>
-              </CardFooter>
-            </Card>
-
-            {(isLoading || showRecommendation) && (
-              <Card className="bg-white/80 dark:bg-white/10 backdrop-blur-md border-white/20 shadow-2xl">
-                <CardHeader className="text-left">
-                  <CardTitle className="text-foreground font-medium text-base h-6 leading-6">Krok 2: Twoja rekomendacja</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <div className="flex items-center justify-center py-12">
-                      <p className="text-muted-foreground">
-                        Analizuję Twoje zapytanie...
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="rounded-xl bg-muted/50 p-6 border border-border/50">
-                      <pre className="whitespace-pre-wrap font-mono text-sm text-foreground">
-                        {recommendation}
-                      </pre>
-                    </div>
-                  )}
-                </CardContent>
-                {!isLoading && showRecommendation && (
-                  <CardFooter className="flex-col gap-3 ">
-                    <Button
-                      variant="secondary"
-                      className="w-full"
-                      onClick={handleCopy}
-                    >
-                      📋 Skopiuj
-                    </Button>
-                    <Button
-                      className="w-full"
-                      onClick={() => setIsModalOpen(true)}
-                    >
-                      📅 Rezerwuj Imprezę
-                    </Button>
-                  </CardFooter>
-                )}
-              </Card>
-            )}
-
+            <CateringCalculator />
             <section className="py-12">
               <div className="max-w-7xl mx-auto px-6">
                 <h2 className="text-3xl font-bold tracking-tight m:text-4xl mb-8">

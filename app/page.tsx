@@ -1,40 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { quickQueries } from "@/data/catering";
-import { parseQuery, generateRecommendation } from "@/lib/catering-logic";
-import { toast } from "sonner";
-import { Sparkles } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { ReservationForm } from "@/components/ReservationForm";
+
 import Image from "next/image";
-import { CateringCalculator } from "@/components/CateringCalculator";
+import { CateringCalculator, type Step } from "@/components/CateringCalculator";
 
 export default function CateringPage() {
-  const [query, setQuery] = useState("");
-  const [recommendation, setRecommendation] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [showRecommendation, setShowRecommendation] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [calculatorStep, setCalculatorStep] = useState<Step>(1);
+  const calculatorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -42,36 +19,6 @@ export default function CateringPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleGenerate = () => {
-    if (!query.trim()) {
-      toast.error("Błąd", { description: "Proszę wpisać zapytanie!" });
-      return;
-    }
-    setIsLoading(true);
-    setShowRecommendation(false);
-    setTimeout(() => {
-      const parsed = parseQuery(query);
-      const result = generateRecommendation(parsed);
-      setRecommendation(result);
-      setIsLoading(false);
-      setShowRecommendation(true);
-    }, 1500);
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(recommendation);
-    toast.success("Skopiowano!", {
-      description: "Rekomendacja jest w Twoim schowku.",
-    });
-  };
-
-  const handleReservationSuccess = () => {
-    setIsModalOpen(false);
-    toast.success("Sukces!", {
-      description:
-        "Twoje zgłoszenie zostało wysłane. Skontaktujemy się wkrótce.",
-    });
-  };
 
   return (
     <>
@@ -107,7 +54,12 @@ export default function CateringPage() {
             </div>
           </header>
           <main className="px-4 w-full max-w-2xl space-y-8">
-            <CateringCalculator />
+            <div ref={calculatorRef} className="scroll-mt-24">
+              <CateringCalculator
+                externalStep={calculatorStep}
+                onStepChange={setCalculatorStep}
+              />
+            </div>
             <section className="py-12">
               <div className="max-w-7xl mx-auto px-6">
                 <h2 className="text-3xl font-bold tracking-tight m:text-4xl mb-8">
@@ -174,15 +126,19 @@ export default function CateringPage() {
                 <div className="flex flex-col md:flex-row gap-4 mt-12 w-full">
                   <Button
                     variant="default"
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => {
+                      setCalculatorStep(3);
+                      calculatorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }}
                     className="w-full md:flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-medium h-14 rounded-xl transition-all duration-200 shadow-lg hover:shadow-primary/20"
                   >
                     Rezerwuj Imprezę
                   </Button>
                   <Button
+                    asChild
                     className="w-full md:flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-medium h-14 rounded-xl transition-all duration-200 shadow-lg hover:shadow-primary/20"
                   >
-                    Zadzwoń
+                    <a href="tel:510219510">Zadzwoń</a>
                   </Button>
                 </div>
               </div>

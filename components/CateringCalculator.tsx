@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -31,7 +31,7 @@ const FORM_FIELDS = [
     { name: "date", placeholder: "", type: "date" },
 ]
 
-type Step = 1 | 2 | 3
+export type Step = 1 | 2 | 3
 
 const Loader = () => (
     <div className="flex justify-center items-center py-12">
@@ -75,8 +75,25 @@ const useTypewriter = (phrases: string[], typingSpeed = 50, deletingSpeed = 30, 
     return text
 }
 
-export const CateringCalculator = () => {
-    const [step, setStep] = useState<Step>(1)
+export interface CateringCalculatorProps {
+    externalStep?: Step
+    onStepChange?: (step: Step) => void
+}
+
+export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalculatorProps) => {
+    const [internalStep, setInternalStep] = useState<Step>(1)
+    const containerRef = useRef<HTMLDivElement>(null)
+
+    const step = externalStep ?? internalStep
+
+    const setStep = (s: Step) => {
+        if (onStepChange) {
+            onStepChange(s)
+        } else {
+            setInternalStep(s)
+        }
+    }
+
     const [inputValue, setInputValue] = useState("")
     const [recommendation, setRecommendation] = useState("")
     const [history, setHistory] = useState<string[]>([])
@@ -132,6 +149,7 @@ export const CateringCalculator = () => {
     }
 
     const handleBook = () => {
+        containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
         setIsLoading(true)
         setTimeout(() => {
             setStep(3)
@@ -140,6 +158,7 @@ export const CateringCalculator = () => {
     }
 
     const handleReset = () => {
+        containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
         setStep(1)
         setInputValue("")
         setRecommendation("")
@@ -318,7 +337,7 @@ export const CateringCalculator = () => {
     )
 
     return (
-        <Card className="w-full max-w-2xl rounded-2xl border border-border bg-card/50 p-4 sm:p-8 backdrop-blur-sm transition-all duration-500 shadow-xl">
+        <Card ref={containerRef} className="w-full max-w-2xl rounded-2xl border border-border bg-card/50 p-4 sm:p-8 backdrop-blur-sm transition-all duration-500 shadow-xl scroll-mt-24">
             {/* Stepper Indicator */}
             <div className="flex items-center justify-between mb-8 px-4 relative">
                 <div className="absolute left-0 top-1/2 w-full h-0.5 bg-muted -z-10"></div>

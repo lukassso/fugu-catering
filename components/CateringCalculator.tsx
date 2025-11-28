@@ -9,6 +9,19 @@ import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
 import { parseQuery, generateRecommendation } from "@/lib/catering-logic"
 import { Sparkles } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { reservationSchema, type ReservationFormValues } from "@/lib/validators"
+import { submitCateringRequest } from "@/lib/actions"
+import { toast } from "sonner"
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form"
 
 const DEFAULT_CHIPS = [
     "20 osób, mix rolek",
@@ -24,12 +37,7 @@ const PLACEHOLDERS = [
     "np. 50 osób, mix zestawów, dużo wege"
 ]
 
-const FORM_FIELDS = [
-    { name: "name", placeholder: "Imię i nazwisko", type: "text" },
-    { name: "email", placeholder: "Email", type: "email" },
-    { name: "phone", placeholder: "Telefon", type: "tel" },
-    { name: "date", placeholder: "", type: "date" },
-]
+
 
 export type Step = 1 | 2 | 3
 
@@ -99,10 +107,20 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
     const [history, setHistory] = useState<string[]>([])
     const [isCopied, setIsCopied] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-
-    // Form states
     const [attachRecommendation, setAttachRecommendation] = useState(true)
-    const [acceptTerms, setAcceptTerms] = useState(false)
+
+    const form = useForm<ReservationFormValues>({
+        resolver: zodResolver(reservationSchema),
+        defaultValues: {
+            name: "",
+            email: "",
+            phone: "",
+            date: "",
+            notes: "",
+            recommendation: "",
+            terms: false,
+        },
+    })
 
     const placeholderText = useTypewriter(PLACEHOLDERS)
 
@@ -136,6 +154,32 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
             setStep(2)
             setIsLoading(false)
         }, 800)
+    }
+
+    async function onSubmit(data: ReservationFormValues) {
+        setIsLoading(true)
+
+        // If user wants to attach recommendation, ensure it's in the data
+        const finalData = {
+            ...data,
+            recommendation: attachRecommendation ? recommendation : undefined
+        }
+
+        const result = await submitCateringRequest(finalData)
+
+        setIsLoading(false)
+
+        if (result.success) {
+            toast.success("Sukces!", {
+                description: result.message,
+            })
+            // Optional: Reset form or redirect
+            handleReset()
+        } else {
+            toast.error("Błąd", {
+                description: result.message,
+            })
+        }
     }
 
     const handleCopy = async () => {
@@ -255,7 +299,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
     )
 
     const renderStep3 = () => (
-        <>
+        <Form {...form}>
             <div className="mb-6">
                 <h3 className="mb-4 text-lg font-medium text-foreground">Rekomendacja i Zgody</h3>
 
@@ -276,45 +320,101 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                         </Label>
                     </div>
 
-                    <div className="flex items-start space-x-3">
-                        <Checkbox
-                            id="terms"
-                            checked={acceptTerms}
-                            onCheckedChange={(c) => setAcceptTerms(!!c)}
-                            className="mt-1 border-input bg-background data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
-                        />
-                        <div className="grid gap-1.5 leading-none">
-                            <Label htmlFor="terms" className="text-sm font-bold text-foreground cursor-pointer">
-                                Akceptuję warunki *
-                            </Label>
-                            <p className="text-xs text-muted-foreground">
-                                Rozumiem, że jest to wstępna propozycja, a ostateczne zamówienie zostanie potwierdzone kontaktowo.
-                            </p>
-                        </div>
-                    </div>
+                    <FormField
+                        control={form.control}
+                        name="terms"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormControl>
+                                    <Checkbox
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        className="mt-1 border-input bg-background data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
+                                    />
+                                </FormControl>
+                                <div className="space-y-1 leading-none">
+                                    <FormLabel className="text-sm font-bold text-foreground cursor-pointer">
+                                        Akceptuję warunki *
+                                    </FormLabel>
+                                    <p className="text-xs text-muted-foreground">
+                                        Rozumiem, że jest to wstępna propozycja, a ostateczne zamówienie zostanie potwierdzone kontaktowo.
+                                    </p>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    />
                 </div>
 
                 <h3 className="mb-4 text-lg font-medium text-foreground">Dodatkowe Informacje</h3>
 
-                <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {FORM_FIELDS.map((field) => (
-                            <Input
-                                key={field.name}
-                                type={field.type}
-                                placeholder={field.placeholder}
-                                className="h-auto w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0"
-                            />
-                        ))}
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input placeholder="Imię i nazwisko" {...field} className="h-auto w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input placeholder="Email" type="email" {...field} className="h-auto w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="phone"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input placeholder="Telefon" type="tel" {...field} className="h-auto w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="date"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input placeholder="Data" type="date" {...field} className="h-auto w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                     </div>
-                    <Textarea
-                        placeholder="Dodatkowe uwagi (opcjonalnie)"
-                        rows={3}
-                        className="w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0"
+                    <FormField
+                        control={form.control}
+                        name="notes"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <Textarea placeholder="Dodatkowe uwagi (opcjonalnie)" rows={3} {...field} className="w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
 
                     <div className="flex gap-3 pt-2">
                         <Button
+                            type="button"
                             onClick={() => setStep(2)}
                             variant="outline"
                             size="lg"
@@ -323,17 +423,18 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                             Wróć
                         </Button>
                         <Button
+                            type="submit"
                             variant="default"
                             size="lg"
                             className="flex-[2]"
-                            disabled={!acceptTerms}
+                            disabled={isLoading}
                         >
-                            Wyślij zgłoszenie
+                            {isLoading ? "Wysyłanie..." : "Wyślij zgłoszenie"}
                         </Button>
                     </div>
                 </form>
             </div>
-        </>
+        </Form>
     )
 
     return (

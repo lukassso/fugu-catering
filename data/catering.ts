@@ -101,7 +101,7 @@ export const menuData: MenuItem[] = [
     pieceCount: 44,
     price: 146.00,
     tags: ["zestaw", "surowe", "mieszane", "klasyczne"],
-    image: "https://cs.cdn-upm.com/product-images/1bfc9f16-4db0-11ef-9141-525400080621/92f9c1f5-3899-11f0-9141-525400080621/2/huge/feb181f3-3aed-4174-9ff9-efe19d68ba35.webp",
+    image: "https://cs.cdn-upm.com/product-images/1bfc9f16-4db0-11ef-9141-525400080621/92f9c1f5-3899-11f0-9141-525400080621/3/huge/aa03696c-a896-473c-b216-2eacfd8acda7.webp",
     link: "https://www.fugu-sushi.pl/menu?pid=92f9c1f5-3899-11f0-9141-525400080621"
   },
   {
@@ -171,7 +171,7 @@ export const menuData: MenuItem[] = [
     pieceCount: 99,
     price: 399.00,
     tags: ["zestaw", "mieszane", "party", "duży"],
-    image: "https://cs.cdn-upm.com/product-images/1bfc9f16-4db0-11ef-9141-525400080621/b129ce06-54d3-11ef-9141-525400080621/2/huge/m15_11zon.webp",
+    image: "https://cs.cdn-upm.com/product-images/1bfc9f16-4db0-11ef-9141-525400080621/b129ce06-54d3-11ef-9141-525400080621/3/huge/44c7940d-4770-42f6-ae7a-12e9f350be6b.webp",
     link: "https://www.fugu-sushi.pl/menu?pid=b129ce06-54d3-11ef-9141-525400080621"
   },
   {
@@ -209,7 +209,7 @@ export const menuData: MenuItem[] = [
     pieceCount: 26,
     price: 99.00,
     tags: ["zestaw", "wege"],
-    image: "https://cs.cdn-upm.com/product-images/1bfc9f16-4db0-11ef-9141-525400080621/75b586f8-54d5-11ef-9141-525400080621/2/huge/q1_11zon.webp",
+    image: "https://cs.cdn-upm.com/product-images/1bfc9f16-4db0-11ef-9141-525400080621/75b586f8-54d5-11ef-9141-525400080621/3/huge/87994442-c46e-4297-8c3a-13002966be0d.webp",
     link: "https://www.fugu-sushi.pl/menu?pid=75b586f8-54d5-11ef-9141-525400080621"
   },
   {

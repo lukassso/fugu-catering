@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 
 import Image from "next/image";
 import { CateringCalculator, type Step } from "@/components/CateringCalculator";
+import { OfferGrid } from "@/components/OfferGrid";
 
 export default function CateringPage() {
   const [scrollY, setScrollY] = useState(0);
@@ -53,13 +54,16 @@ export default function CateringPage() {
               </h2>
             </div>
           </header>
-          <main className="px-4 w-full max-w-2xl space-y-8">
-            <div ref={calculatorRef} className="scroll-mt-24">
+          <main className="px-4 w-full space-y-8">
+            <div ref={calculatorRef} className="scroll-mt-24 w-full max-w-2xl mx-auto">
               <CateringCalculator
                 externalStep={calculatorStep}
                 onStepChange={setCalculatorStep}
               />
             </div>
+
+            <OfferGrid />
+
             <section className="py-12">
               <div className="max-w-7xl mx-auto px-6">
                 <h2 className="text-3xl font-bold tracking-tight m:text-4xl mb-8">

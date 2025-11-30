@@ -30,7 +30,7 @@ export async function submitCateringRequest(
         return { success: false, message: "Przesłano nieprawidłowe dane." };
     }
 
-    const { name, email, phone, date, notes, recommendation } = result.data;
+    const { name, email, phone, date, notes, recommendation, query } = result.data;
 
     try {
         const { data, error } = await resend.emails.send({
@@ -47,6 +47,8 @@ export async function submitCateringRequest(
             <li><strong>Email:</strong> <a href="mailto:${email}">${email}</a></li>
             <li><strong>Telefon:</strong> <a href="tel:${phone}">${phone}</a></li>
           </ul>
+          <h2>Oryginalne zapytanie:</h2>
+          <p style="font-style: italic; background-color: #f9f9f9; padding: 10px; border-left: 3px solid #ccc;">"${query || 'Brak treści zapytania'}"</p>
           <h2>Dodatkowe uwagi:</h2>
           <p>${notes || 'Brak uwag'}</p>
           <hr>

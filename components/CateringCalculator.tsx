@@ -89,6 +89,11 @@ export interface CateringCalculatorProps {
 }
 
 export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalculatorProps) => {
+    interface HistoryItem {
+        query: string
+        response: string
+    }
+
     const [internalStep, setInternalStep] = useState<Step>(1)
     const containerRef = useRef<HTMLDivElement>(null)
 
@@ -104,7 +109,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
 
     const [inputValue, setInputValue] = useState("")
     const [recommendation, setRecommendation] = useState("")
-    const [history, setHistory] = useState<string[]>([])
+    const [history, setHistory] = useState<HistoryItem[]>([])
     const [isCopied, setIsCopied] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [attachRecommendation, setAttachRecommendation] = useState(true)
@@ -129,15 +134,23 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
         const savedHistory = localStorage.getItem("catering_history")
         if (savedHistory) {
             try {
-                setHistory(JSON.parse(savedHistory) as string[])
+                const parsed = JSON.parse(savedHistory)
+                // Handle migration from old string[] format
+                if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
+                    localStorage.removeItem("catering_history")
+                    setHistory([])
+                } else {
+                    setHistory(parsed as HistoryItem[])
+                }
             } catch (e) {
                 console.error("Failed to parse history", e)
             }
         }
     }, [])
 
-    const saveToHistory = (query: string) => {
-        const newHistory = [query, ...history.filter(h => h !== query)].slice(0, 5)
+    const saveToHistory = (query: string, response: string) => {
+        const newItem = { query, response }
+        const newHistory = [newItem, ...history.filter(h => h.query !== query)].slice(0, 5)
         setHistory(newHistory)
         localStorage.setItem("catering_history", JSON.stringify(newHistory))
     }
@@ -150,7 +163,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
             const result = await generateCateringProposal(inputValue)
             if (result.success && result.recommendation) {
                 setRecommendation(result.recommendation)
-                saveToHistory(inputValue)
+                saveToHistory(inputValue, result.recommendation)
                 setStep(2)
             } else {
                 toast.error("Błąd generowania", {
@@ -173,7 +186,8 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
         // If user wants to attach recommendation, ensure it's in the data
         const finalData = {
             ...data,
-            recommendation: attachRecommendation ? recommendation : undefined
+            recommendation: attachRecommendation ? recommendation : undefined,
+            query: inputValue
         }
 
         const result = await submitCateringRequest(finalData)
@@ -219,6 +233,16 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
         setRecommendation("")
     }
 
+    const truncate = (str: string, n: number) => {
+        return str.length > n ? str.slice(0, n) + "..." : str
+    }
+
+    const handleHistoryClick = (item: HistoryItem) => {
+        setInputValue(item.query)
+        setRecommendation(item.response)
+        setStep(3) // Go directly to reservation form as requested
+    }
+
     const renderStep1 = () => (
         <>
             <div className="mb-6">
@@ -236,22 +260,42 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                 />
             </div>
 
-            <div className="mb-8">
-                <p className="mb-2 text-xs text-muted-foreground uppercase tracking-wider">Ostatnie zapytania:</p>
-                <div className="flex flex-wrap gap-2">
-                    {(history.length > 0 ? history : DEFAULT_CHIPS).map((chip) => (
-                        <button
-                            key={chip}
-                            onClick={() => setInputValue(chip)}
-                            className={`rounded-full cursor-pointer px-5 py-3 text-xs font-medium transition-all duration-200 ${inputValue === chip
-                                ? "bg-background text-foreground border border-orange-500 shadow-sm ring-1 ring-orange-500/20"
-                                : "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-transparent"
-                                }`}
-                        >
-                            {chip}
-                        </button>
-                    ))}
+            <div className="mb-8 space-y-4">
+                <div>
+                    <p className="mb-2 text-xs text-muted-foreground uppercase tracking-wider">Przykładowe zapytania:</p>
+                    <div className="flex flex-wrap gap-2">
+                        {DEFAULT_CHIPS.map((chip) => (
+                            <button
+                                key={chip}
+                                onClick={() => setInputValue(chip)}
+                                className={`rounded-full cursor-pointer px-5 py-3 text-xs font-medium transition-all duration-200 ${inputValue === chip
+                                    ? "bg-background text-foreground border border-orange-500 shadow-sm ring-1 ring-orange-500/20"
+                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-transparent"
+                                    }`}
+                            >
+                                {chip}
+                            </button>
+                        ))}
+                    </div>
                 </div>
+
+                {history.length > 0 && (
+                    <div>
+                        <p className="mb-2 text-xs text-muted-foreground uppercase tracking-wider">Twoja historia:</p>
+                        <div className="flex flex-wrap gap-2">
+                            {history.map((item, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handleHistoryClick(item)}
+                                    className="rounded-full cursor-pointer px-5 py-3 text-xs font-medium transition-all duration-200 bg-orange-100 text-orange-800 hover:bg-orange-200 border border-orange-200"
+                                    title={item.query}
+                                >
+                                    {truncate(item.query, 30)}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <Button
@@ -313,6 +357,13 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
         <Form {...form}>
             <div className="mb-6">
                 <h3 className="mb-4 text-lg font-medium text-foreground">Rekomendacja i Zgody</h3>
+
+                <div className="mb-4">
+                    <p className="text-xs text-muted-foreground mb-1">Twoje zapytanie:</p>
+                    <div className="bg-muted/50 rounded-lg p-3 text-sm text-foreground italic border border-border">
+                        {inputValue}
+                    </div>
+                </div>
 
                 <div className="bg-[#f5f5f0] text-gray-800 rounded-lg p-6 mb-4 border-l-4 border-green-500 text-sm whitespace-pre-wrap font-mono leading-relaxed max-h-[300px] overflow-y-auto">
                     {recommendation}

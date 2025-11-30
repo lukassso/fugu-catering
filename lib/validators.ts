@@ -5,6 +5,7 @@ const commonFields = {
     phone: z.string().min(9, { message: "Proszę podać prawidłowy numer telefonu." }),
     notes: z.string().optional(),
     recommendation: z.string().optional(),
+    query: z.string().optional(),
 };
 
 const termsField = z.boolean().refine((val) => val === true, {

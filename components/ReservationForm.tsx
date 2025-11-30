@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { reservationSchema, type ReservationFormValues } from "@/lib/validators";
+import { detailedReservationSchema, type DetailedReservationFormValues } from "@/lib/validators";
 import { submitCateringRequest } from "@/lib/actions";
 
 import { Button } from "@/components/ui/button";
@@ -23,8 +23,8 @@ interface ReservationFormProps {
 export function ReservationForm({ recommendation, onClose, onSubmitSuccess }: ReservationFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<ReservationFormValues>({
-    resolver: zodResolver(reservationSchema),
+  const form = useForm<DetailedReservationFormValues>({
+    resolver: zodResolver(detailedReservationSchema),
     defaultValues: {
       eventName: "",
       eventDate: "",
@@ -40,11 +40,21 @@ export function ReservationForm({ recommendation, onClose, onSubmitSuccess }: Re
     },
   });
 
-  async function onSubmit(values: ReservationFormValues) {
+  async function onSubmit(values: DetailedReservationFormValues) {
     setIsSubmitting(true);
 
     try {
-      const result = await submitCateringRequest(values);
+      const submissionData = {
+        name: values.organizerName,
+        email: values.email,
+        phone: values.phone,
+        date: `${values.eventDate} ${values.eventTime}`,
+        notes: `Impreza: ${values.eventName}, Lokalizacja: ${values.location}. ${values.notes || ""}`,
+        recommendation: values.recommendation,
+        terms: values.acceptTerms
+      };
+
+      const result = await submitCateringRequest(submissionData);
 
       if (result.success) {
         onSubmitSuccess();

@@ -7,12 +7,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
-import { parseQuery, generateRecommendation } from "@/lib/catering-logic"
+
 import { Sparkles } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { reservationSchema, type ReservationFormValues } from "@/lib/validators"
-import { submitCateringRequest } from "@/lib/actions"
+import { submitCateringRequest, generateCateringProposal } from "@/lib/actions"
 import { toast } from "sonner"
 import {
     Form,
@@ -142,18 +142,29 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
         localStorage.setItem("catering_history", JSON.stringify(newHistory))
     }
 
-    const handleGenerate = () => {
+    const handleGenerate = async () => {
         if (!inputValue.trim()) return
 
         setIsLoading(true)
-        setTimeout(() => {
-            const parsed = parseQuery(inputValue)
-            const rec = generateRecommendation(parsed)
-            setRecommendation(rec)
-            saveToHistory(inputValue)
-            setStep(2)
+        try {
+            const result = await generateCateringProposal(inputValue)
+            if (result.success && result.recommendation) {
+                setRecommendation(result.recommendation)
+                saveToHistory(inputValue)
+                setStep(2)
+            } else {
+                toast.error("Błąd generowania", {
+                    description: result.message || "Spróbuj ponownie później."
+                })
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error("Wystąpił błąd", {
+                description: "Nie udało się połączyć z serwerem."
+            })
+        } finally {
             setIsLoading(false)
-        }, 800)
+        }
     }
 
     async function onSubmit(data: ReservationFormValues) {

@@ -2,6 +2,8 @@
 
 import { Resend } from 'resend';
 import * as validators from './validators';
+import { genai } from './genai';
+import { menuData } from '@/data/catering';
 
 type FormSubmissionResult = {
     success: boolean;
@@ -64,5 +66,59 @@ export async function submitCateringRequest(
     } catch (exception) {
         console.error("Krytyczny błąd podczas wysyłania emaila:", exception);
         return { success: false, message: "Wystąpił nieoczekiwany błąd serwera." };
+    }
+}
+
+export async function generateCateringProposal(userQuery: string) {
+    if (!process.env.GEMINI_API_KEY) {
+        console.error("Brak klucza API Gemini");
+        return { success: false, message: "Konfiguracja AI nie jest gotowa." };
+    }
+
+    try {
+        const menuContext = menuData.map(item =>
+            `- ${item.name} (${item.pieceCount} szt, ${item.price} PLN): ${item.description}. Tags: ${item.tags?.join(", ")}`
+        ).join("\n");
+
+        const prompt = `
+      Jesteś ekspertem od cateringu sushi w Fugu Sushi.
+      Twoim zadaniem jest przygotowanie rekomendacji zamówienia na podstawie zapytania klienta.
+      
+      Oto nasze menu:
+      ${menuContext}
+      
+      Zapytanie klienta: "${userQuery}"
+      
+      Zasady:
+      1. Oblicz zapotrzebowanie (ok. 10-12 sztuk na osobę dorosłą, mniej dla dzieci).
+      2. Zaproponuj konkretne zestawy z menu, aby pokryć zapotrzebowanie.
+      3. Uwzględnij preferencje (wege, bez surowej ryby, etc.).
+      4. Odpowiedź ma być w formacie czytelnym dla klienta, gotowym do wklejenia w maila lub pokazania na stronie.
+      5. Bądź uprzejmy i profesjonalny.
+      6. Nie zmyślaj zestawów spoza menu.
+      7. Używaj polskich znaków i poprawnej gramatyki.
+      8. Używaj emoji (🍣, 🍱, ✅) z umiarem, aby ożywić tekst.
+      9. Na końcu podaj szacunkowy koszt.
+    `;
+
+        const result = await genai.models.generateContent({
+            model: "gemini-2.0-flash",
+            contents: [
+                {
+                    parts: [
+                        {
+                            text: prompt
+                        }
+                    ]
+                }
+            ]
+        });
+
+        const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "Nie udało się wygenerować odpowiedzi.";
+
+        return { success: true, recommendation: text };
+    } catch (e) {
+        console.error("Gemini error:", e);
+        return { success: false, message: "Nie udało się wygenerować rekomendacji." };
     }
 }

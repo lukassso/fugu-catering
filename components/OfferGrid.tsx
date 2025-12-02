@@ -1,15 +1,18 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { menuData } from '@/data/catering';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Loader2 } from 'lucide-react';
 
 export const OfferGrid = () => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [isDense, setIsDense] = useState(false); // false = 3 cols, true = 4 cols
+    const [visibleCount, setVisibleCount] = useState(8);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     // Extract unique tags
     const allTags = useMemo(() => {
@@ -41,6 +44,22 @@ export const OfferGrid = () => {
 
         return data;
     }, [selectedTags]);
+
+    // Reset visible count when filters change
+    useEffect(() => {
+        setVisibleCount(8);
+    }, [selectedTags]);
+
+    const handleLoadMore = async () => {
+        setIsLoadingMore(true);
+        // Simulate network delay for better UX
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setVisibleCount(prev => prev + 8);
+        setIsLoadingMore(false);
+    };
+
+    const visibleData = filteredAndSortedData.slice(0, visibleCount);
+    const hasMore = visibleCount < filteredAndSortedData.length;
 
     return (
         <div className="w-full py-8 relative">
@@ -100,8 +119,6 @@ export const OfferGrid = () => {
                             </svg>
                         </Button>
                     </div>
-
-
                 </div>
             </div>
 
@@ -110,7 +127,7 @@ export const OfferGrid = () => {
                 "grid grid-cols-1 gap-8 transition-all duration-300",
                 isDense ? "md:grid-cols-4" : "md:grid-cols-3"
             )}>
-                {filteredAndSortedData.map((item, index) => {
+                {visibleData.map((item, index) => {
                     const isLink = !!item.link;
                     const Wrapper = isLink ? 'a' : 'div';
 
@@ -168,6 +185,28 @@ export const OfferGrid = () => {
                     );
                 })}
             </div>
+
+            {/* Load More Button */}
+            {hasMore && (
+                <div className="mt-12 flex justify-center">
+                    <Button
+                        onClick={handleLoadMore}
+                        disabled={isLoadingMore}
+                        variant="default"
+                        size="lg"
+                        className="min-w-[200px] h-12 text-base font-medium"
+                    >
+                        {isLoadingMore ? (
+                            <>
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                Ładowanie...
+                            </>
+                        ) : (
+                            'Załaduj więcej'
+                        )}
+                    </Button>
+                </div>
+            )}
 
             {/* Filter Dialog Overlay */}
             {isFilterOpen && (

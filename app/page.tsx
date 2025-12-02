@@ -152,12 +152,15 @@ export default function CateringPage() {
             </section>
           </main>
 
-          <footer className="mt-12 text-center text-sm text-muted-foreground bottom-0">
-            <p>
+          <footer className="mt-12 text-center text-sm text-muted-foreground bottom-0 pb-8">
+            <p className="mb-2">
               FUGU SUSHI | ul. Chodkiewicza 7, Warszawa |{" "}
               <a href="tel:510219510" className="hover:underline">
                 510 219 510
               </a>
+            </p>
+            <p>
+              &copy; {new Date().getFullYear()} Fugu Sushi. Wszelkie prawa zastrzeżone.
             </p>
           </footer>
         </div>

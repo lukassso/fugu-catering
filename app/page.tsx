@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { CateringCalculator, type Step } from "@/components/CateringCalculator";
 import { OfferGrid } from "@/components/OfferGrid";
+import { HowItWorks } from "@/components/HowItWorks";
 
 export default function CateringPage() {
   const [scrollY, setScrollY] = useState(0);
@@ -61,6 +62,8 @@ export default function CateringPage() {
                 onStepChange={setCalculatorStep}
               />
             </div>
+
+            <HowItWorks />
 
             <OfferGrid />
 

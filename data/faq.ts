@@ -11,13 +11,13 @@ export interface FAQItem {
 export const faqData: FAQItem[] = [
     {
         id: "faq-1",
-        question: "Jak daleko z góry powinienem zamawiać catering sushi?",
+        question: "Jak bardzo z wyprzedzeniem powinienem zamawiać catering sushi?",
         answer: "Zalecamy zamawianie catering sushi co najmniej **48 godzin (2 dni) z wyprzedzeniem**.",
         details: [
             {
                 type: 'list',
                 content: [
-                    "**Standardowe zamówienia (10-30 gości):** 48 godzin wcześniej",
+                    "**Standardowe zamówienia (10-30 gości):**24 godzin wcześniej",
                     "**Duże zamówienia (ponad 50 gości):** 7-10 dni z góry",
                     "**Specjalne życzenia lub menu premium:** 10-14 dni wcześniej"
                 ]

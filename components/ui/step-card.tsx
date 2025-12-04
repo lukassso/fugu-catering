@@ -35,9 +35,9 @@ export function StepCard({
                 className
             )}
         >
-            <CardContent className="p-6 md:p-8 relative z-10 h-full flex flex-col justify-between min-h-[180px]">
+            <CardContent className="p-6 md:p-6 relative z-10 h-full flex flex-col justify-between min-h-[120px] md:min-h-[150px]">
                 <div>
-                    <div className="flex justify-between items-start mb-4">
+                    <div className="flex justify-between items-start mb-2">
                         <div className="flex items-center gap-3">
                             {icon && (
                                 <div className="text-primary/80 group-hover:text-primary transition-colors">

@@ -1,103 +1,108 @@
+"use client";
+
 import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
+import { Section, SectionHeader, SectionDivider, FloatingDecorator } from "@/components/ui/section";
+import { StepCard, FeatureItem } from "@/components/ui/step-card";
+import { Pen, Sparkles, PartyPopper } from "lucide-react";
+
+// ============================================================================
+// STEPS DATA - Centralized data for steps (DRY)
+// ============================================================================
+
+const STEPS_DATA = [
+    {
+        stepNumber: 1,
+        title: "Opis wydarzenia",
+        description: "Wpisz liczbę gości i preferencje w naszym kalkulatorze.",
+        icon: <Pen className="w-5 h-5" />,
+    },
+    {
+        stepNumber: 2,
+        title: "Otrzymaj ofertę",
+        description: "AI natychmiast wygeneruje idealnie dopasowane menu.",
+        icon: <Sparkles className="w-5 h-5" />,
+    },
+    {
+        stepNumber: 3,
+        title: "Zamów i ciesz się",
+        description: "Potwierdź zamówienie, a my zajmiemy się resztą.",
+        icon: <PartyPopper className="w-5 h-5" />,
+    },
+];
+
+const FEATURES_DATA = [
+    "Świeże składniki dostarczane codziennie",
+    "Autorskie przepisy naszych mistrzów sushi",
+    "Elastyczność w dopasowaniu do diety (wege, bez glutenu)",
+    "Ekologiczne opakowania",
+];
+
+// ============================================================================
+// HOW IT WORKS COMPONENT
+// ============================================================================
 
 export function HowItWorks() {
     return (
-        <section className="w-full py-12">
-            <div className="flex flex-col gap-16">
-                <div className="text-center">
-                    <h2 className="text-4xl font-bold mb-4">Jak to działa?</h2>
-                    <p className="text-muted-foreground text-lg">
-                        Prosty proces od pomysłu do realizacji. Skupiamy się na Twojej wygodzie.
-                    </p>
+        <Section size="lg" className="relative overflow-hidden">
+            {/* Background decorators */}
+            <FloatingDecorator position="top-right" size="lg" className="opacity-30" />
+            <FloatingDecorator position="bottom-left" size="md" className="opacity-20" />
+
+            <div className="flex flex-col gap-12 md:gap-16 relative z-10">
+                {/* Section Header */}
+                <SectionHeader
+                    title="Jak to działa?"
+                    subtitle="Prosty proces od pomysłu do realizacji. Skupiamy się na Twojej wygodzie."
+                />
+
+                {/* Steps Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                    {STEPS_DATA.map((step) => (
+                        <StepCard
+                            key={step.stepNumber}
+                            stepNumber={step.stepNumber}
+                            title={step.title}
+                            description={step.description}
+                            icon={step.icon}
+                        />
+                    ))}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Step 1 */}
-                    <Card className="bg-card/50 backdrop-blur-sm border-muted/40 relative overflow-hidden group hover:border-primary/50 transition-colors">
-                        <CardContent className="p-8 relative z-10 h-full flex flex-col justify-between">
-                            <div>
-                                <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-xl font-bold">Opis wydarzenia</h3>
-                                    <span className="text-6xl font-bold text-primary/10 absolute top-2 right-4 group-hover:text-primary/20 transition-colors select-none">
-                                        01
-                                    </span>
-                                </div>
-                                <p className="text-muted-foreground relative z-10">
-                                    Wpisz liczbę gości i preferencje w naszym kalkulatorze.
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Step 2 */}
-                    <Card className="bg-card/50 backdrop-blur-sm border-muted/40 relative overflow-hidden group hover:border-primary/50 transition-colors">
-                        <CardContent className="p-8 relative z-10 h-full flex flex-col justify-between">
-                            <div>
-                                <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-xl font-bold">Otrzymaj ofertę</h3>
-                                    <span className="text-6xl font-bold text-primary/10 absolute top-2 right-4 group-hover:text-primary/20 transition-colors select-none">
-                                        02
-                                    </span>
-                                </div>
-                                <p className="text-muted-foreground relative z-10">
-                                    AI natychmiast wygeneruje idealnie dopasowane menu.
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Step 3 */}
-                    <Card className="bg-card/50 backdrop-blur-sm border-muted/40 relative overflow-hidden group hover:border-primary/50 transition-colors">
-                        <CardContent className="p-8 relative z-10 h-full flex flex-col justify-between">
-                            <div>
-                                <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-xl font-bold">Zamów i ciesz się</h3>
-                                    <span className="text-6xl font-bold text-primary/10 absolute top-2 right-4 group-hover:text-primary/20 transition-colors select-none">
-                                        03
-                                    </span>
-                                </div>
-                                <p className="text-muted-foreground relative z-10">
-                                    Potwierdź zamówienie, a my zajmiemy się resztą.
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
+                {/* Divider */}
+                <SectionDivider variant="gradient" className="relative" />
 
                 {/* Why Fugu Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center pt-8">
-                    <div className="relative flex justify-center lg:justify-center">
-                        <div className="relative w-[300px] h-[300px] md:w-[500px] md:h-[500px]">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center pt-4">
+                    {/* Image */}
+                    <div className="relative flex justify-center lg:justify-center order-2 lg:order-1">
+                        <div className="relative w-[280px] h-[280px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px]">
                             <Image
                                 src="/image 35.svg"
-                                alt="Sushi Plate"
+                                alt="Talerz sushi Fugu"
                                 fill
                                 className="object-contain drop-shadow-2xl"
+                                priority
                             />
                         </div>
+                        {/* Decorative ring behind image */}
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="w-[90%] h-[90%] rounded-full border border-primary/10" />
+                        </div>
                     </div>
-                    <div className="space-y-8">
-                        <h2 className="text-4xl font-bold">Dlaczego Fugu?</h2>
-                        <ul className="space-y-6">
-                            {[
-                                "Świeże składniki dostarczane codziennie",
-                                "Autorskie przepisy naszych mistrzów sushi",
-                                "Elastyczność w dopasowaniu do diety (wege, bez glutenu)",
-                                "Ekologiczne opakowania",
-                            ].map((item, index) => (
-                                <li
-                                    key={index}
-                                    className="flex items-center gap-4 text-lg text-muted-foreground"
-                                >
-                                    <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
-                                    {item}
-                                </li>
+
+                    {/* Features List */}
+                    <div className="space-y-6 md:space-y-8 order-1 lg:order-2">
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                            Dlaczego <span className="text-primary">Fugu</span>?
+                        </h2>
+                        <ul className="space-y-4 md:space-y-6">
+                            {FEATURES_DATA.map((feature, index) => (
+                                <FeatureItem key={index} text={feature} />
                             ))}
                         </ul>
                     </div>
                 </div>
             </div>
-        </section>
+        </Section>
     );
 }

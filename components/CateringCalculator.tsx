@@ -8,7 +8,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
 
-import { Sparkles } from "lucide-react"
+import { Sparkles, Loader2 } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { reservationSchema, type ReservationFormValues } from "@/lib/validators"
@@ -43,10 +44,7 @@ export type Step = 1 | 2 | 3
 
 const Loader = () => (
     <div className="flex justify-center items-center py-12">
-        <svg className="animate-spin h-8 w-8 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
+        <Loader2 className="animate-spin h-8 w-8 text-primary" />
     </div>
 )
 
@@ -256,7 +254,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
                     placeholder={placeholderText}
-                    className="min-h-[80px] w-full rounded-xl border-none bg-muted/50 px-4 py-3 text-foreground placeholder:text-muted-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0 resize-y"
+                    className="min-h-[80px] w-full rounded-xl border-none bg-muted/50 px-4 py-3 text-foreground placeholder:text-muted-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 resize-y"
                 />
             </div>
 
@@ -268,10 +266,10 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                             <button
                                 key={chip}
                                 onClick={() => setInputValue(chip)}
-                                className={`rounded-full cursor-pointer px-5 py-3 text-xs font-medium transition-all duration-200 ${inputValue === chip
-                                    ? "bg-background text-foreground border border-orange-500 shadow-sm ring-1 ring-orange-500/20"
-                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-transparent"
-                                    }`}
+                                className={cn(
+                                    "chip cursor-pointer px-4 py-2.5",
+                                    inputValue === chip ? "chip-active" : "chip-default"
+                                )}
                             >
                                 {chip}
                             </button>
@@ -287,7 +285,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                                 <button
                                     key={index}
                                     onClick={() => handleHistoryClick(item)}
-                                    className="rounded-full cursor-pointer px-5 py-3 text-xs font-medium transition-all duration-200 bg-orange-100 text-orange-800 hover:bg-orange-200 border border-orange-200"
+                                    className="chip cursor-pointer chip-history px-4 py-2.5"
                                     title={item.query}
                                 >
                                     {truncate(item.query, 30)}
@@ -302,7 +300,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                 onClick={handleGenerate}
                 disabled={isLoading}
                 variant='default'
-                className="w-full text-xl font-medium h-14 rounded-xl transition-all duration-200 shadow-lg"
+                className="w-full text-xl font-medium h-14 rounded-xl transition-all duration-200 shadow-lg btn-primary"
             >
                 {isLoading ? (
                     "Generowanie..."
@@ -365,7 +363,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                     </div>
                 </div>
 
-                <div className="bg-[#f5f5f0] text-gray-800 rounded-lg p-6 mb-4 border-l-4 border-green-500 text-sm whitespace-pre-wrap font-mono leading-relaxed max-h-[300px] overflow-y-auto">
+                <div className="bg-muted rounded-xl p-6 mb-4 border-l-4 border-primary text-sm whitespace-pre-wrap font-mono leading-relaxed max-h-[300px] overflow-y-auto custom-scrollbar">
                     {recommendation}
                 </div>
 
@@ -375,7 +373,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                             id="attach"
                             checked={attachRecommendation}
                             onCheckedChange={(c) => setAttachRecommendation(!!c)}
-                            className="border-input bg-background data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
+                            className="border-input bg-background data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                         />
                         <Label htmlFor="attach" className="text-sm text-muted-foreground font-normal cursor-pointer hover:text-foreground transition-colors">
                             Załącz powyższą rekomendację do zgłoszenia
@@ -391,7 +389,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                                     <Checkbox
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
-                                        className="mt-1 border-input bg-background data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
+                                        className="mt-1 border-input bg-background data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                                     />
                                 </FormControl>
                                 <div className="space-y-1 leading-none">
@@ -418,7 +416,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Input placeholder="Imię i nazwisko" {...field} className="h-auto w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0" />
+                                        <Input placeholder="Imię i nazwisko" {...field} className="input-unified" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -430,7 +428,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Input placeholder="Email" type="email" {...field} className="h-auto w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0" />
+                                        <Input placeholder="Email" type="email" {...field} className="input-unified" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -442,7 +440,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Input placeholder="Telefon" type="tel" {...field} className="h-auto w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0" />
+                                        <Input placeholder="Telefon" type="tel" {...field} className="input-unified" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -454,7 +452,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Input placeholder="Data" type="date" {...field} className="h-auto w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0" />
+                                        <Input placeholder="Data" type="date" {...field} className="input-unified" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -467,7 +465,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                         render={({ field }) => (
                             <FormItem>
                                 <FormControl>
-                                    <Textarea placeholder="Dodatkowe uwagi (opcjonalnie)" rows={3} {...field} className="w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-0" />
+                                    <Textarea placeholder="Dodatkowe uwagi (opcjonalnie)" rows={3} {...field} className="w-full rounded-xl border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -488,7 +486,7 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                             type="submit"
                             variant="default"
                             size="lg"
-                            className="flex-[2]"
+                            className="flex-[2] btn-primary"
                             disabled={isLoading}
                         >
                             {isLoading ? "Wysyłanie..." : "Wyślij zgłoszenie"}
@@ -507,8 +505,10 @@ export const CateringCalculator = ({ externalStep, onStepChange }: CateringCalcu
                 {[1, 2, 3].map((s) => (
                     <div
                         key={s}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${step >= s ? 'bg-orange-500 text-white scale-110' : 'bg-muted text-muted-foreground'
-                            }`}
+                        className={cn(
+                            "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300",
+                            step >= s ? 'bg-primary text-primary-foreground scale-110' : 'bg-muted text-muted-foreground'
+                        )}
                     >
                         {s}
                     </div>

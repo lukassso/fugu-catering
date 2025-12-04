@@ -7,6 +7,7 @@ import { Section, SectionHeader, SectionDivider, FloatingDecorator } from "@/com
 import { InfoCard } from "@/components/ui/step-card";
 import { CTAButtons, PHONE_NUMBER, PHONE_DISPLAY } from "@/components/ui/cta-buttons";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
+import { StatBubbles } from "@/components/ui/stat-bubbles";
 
 import { CateringCalculator, type Step } from "@/components/CateringCalculator";
 import { OfferGrid } from "@/components/OfferGrid";
@@ -223,15 +224,17 @@ export default function CateringPage() {
       <div className="relative">
         {/* Parallax Background Image - positioned to right edge of VIEWPORT */}
         <div
-          className="hidden lg:block absolute top-0 right-0 w-[50vw] h-full min-h-[700px] pointer-events-none z-0"
+          className="hidden lg:block absolute top-0 right-40 w-[50vw] h-full min-h-[700px] pointer-events-none z-0"
         >
           <div
             className="absolute inset-0 bg-no-repeat bg-contain bg-right-top transition-transform duration-100 ease-out"
             style={{
-              backgroundImage: "url('/bcg1.svg')",
-              transform: `translateY(${scrollY * 0.35}px)`,
+              backgroundImage: "url('/image 34.svg')",
+              transform: `translateY(${scrollY * 0.35}px) rotate(100deg)`,
             }}
           />
+          {/* Floating Stat Bubbles with parallax effect */}
+          <StatBubbles scrollY={scrollY} className="pointer-events-auto" />
         </div>
 
         {/* Hero + Calculator - with margins */}
